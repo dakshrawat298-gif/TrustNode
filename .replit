@@ -50,3 +50,4 @@ externalPort = 3000
 PORT = "3000"
 SOLANA_NETWORK = "devnet"
 SOLANA_RPC_URL = "https://api.devnet.solana.com"
+AGENT_ORACLE_PRIVATE_KEY = "52tQQnnsckVsVSBLj9vGv8w6iRcxPexe7BGRMmR9uX9AAktgUiJ9kYC1xweFuSnEPFLTeYNr2PSemzf35DnbFYuJ"
