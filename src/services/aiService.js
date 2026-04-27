@@ -1,22 +1,30 @@
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-let openaiClient = null;
+let geminiClient = null;
+let geminiModel = null;
 
-function getClient() {
-  if (openaiClient) return openaiClient;
+function getModel() {
+  if (geminiModel) return geminiModel;
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey || apiKey.trim() === '') {
     throw new Error(
-      'OPENAI_API_KEY is not configured. Add it to your environment to enable AI evaluation.'
+      'GEMINI_API_KEY is not configured. Add it to your environment to enable AI evaluation.'
     );
   }
 
-  openaiClient = new OpenAI({ apiKey });
-  return openaiClient;
+  geminiClient = new GoogleGenerativeAI(apiKey);
+  geminiModel = geminiClient.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    generationConfig: {
+      temperature: 0,
+      responseMimeType: 'application/json',
+    },
+  });
+  return geminiModel;
 }
 
 const SYSTEM_PROMPT = `You are TrustNode Oracle, an impartial Web3 escrow judge for a Solana-based AI-Oracle Escrow system.
@@ -40,6 +48,25 @@ You MUST respond with a single valid JSON object and nothing else. The JSON must
 
 No prose. No markdown. No code fences. JSON only.`;
 
+function extractJson(text) {
+  if (!text) return null;
+  const trimmed = text.trim();
+  try {
+    return JSON.parse(trimmed);
+  } catch (_) {
+    const start = trimmed.indexOf('{');
+    const end = trimmed.lastIndexOf('}');
+    if (start !== -1 && end !== -1 && end > start) {
+      try {
+        return JSON.parse(trimmed.slice(start, end + 1));
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
 export async function evaluateFreelancerWork(clientRequirement, freelancerSubmission) {
   if (typeof clientRequirement !== 'string' || clientRequirement.trim() === '') {
     return {
@@ -55,7 +82,7 @@ export async function evaluateFreelancerWork(clientRequirement, freelancerSubmis
   }
 
   try {
-    const client = getClient();
+    const model = getModel();
 
     const userMessage = [
       'CLIENT REQUIREMENT:',
@@ -71,26 +98,19 @@ export async function evaluateFreelancerWork(clientRequirement, freelancerSubmis
       'Evaluate strictly and respond with the required JSON object.',
     ].join('\n');
 
-    const completion = await client.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: userMessage },
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: `${SYSTEM_PROMPT}\n\n${userMessage}` }],
+        },
       ],
-      temperature: 0,
-      response_format: { type: 'json_object' },
     });
 
-    const raw = completion.choices?.[0]?.message?.content?.trim();
-    if (!raw) {
-      throw new Error('Empty response from OpenAI.');
-    }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch (parseErr) {
-      throw new Error(`AI returned non-JSON response: ${parseErr.message}`);
+    const raw = result?.response?.text?.();
+    const parsed = extractJson(raw);
+    if (!parsed) {
+      throw new Error('Gemini returned no parseable JSON.');
     }
 
     const approved = typeof parsed.approved === 'boolean' ? parsed.approved : false;
