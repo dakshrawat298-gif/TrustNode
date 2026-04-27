@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { evaluateFreelancerWork } from '../services/aiService.js';
+import { processEscrow } from '../controllers/escrowController.js';
 
 const router = Router();
 
@@ -25,5 +26,7 @@ router.post('/evaluate', async (req, res) => {
     });
   }
 });
+
+router.post('/escrow/process', processEscrow);
 
 export default router;
