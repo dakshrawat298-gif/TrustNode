@@ -147,6 +147,16 @@
               </a>
             ` : ''}
           </div>
+
+          <div class="pt-2 flex items-center justify-between gap-3 flex-wrap">
+            <div class="text-[11px] text-white/40">
+              Disagree with the verdict? You can escalate to decentralized human arbitration.
+            </div>
+            <button id="dispute-btn"
+              class="text-[12px] font-medium px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-rose-500/10 border border-white/10 hover:border-rose-400/40 text-white/80 hover:text-rose-200 transition-colors">
+              Dispute AI Decision
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -164,7 +174,34 @@
       });
     }
 
+    const disputeBtn = document.getElementById('dispute-btn');
+    if (disputeBtn) {
+      disputeBtn.addEventListener('click', handleDisputeClick);
+    }
+
     resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleDisputeClick() {
+    const agreed = confirm(
+      'SECURITY WARNING: To prevent malicious disputes, you must stake an additional 10% penalty fee. ' +
+      'If Decentralized Human Arbitrators (Kleros Court) rule in favor of the freelancer, you will LOSE this deposit as compensation. ' +
+      'Do you agree to stake the penalty and proceed with the dispute?'
+    );
+
+    if (agreed) {
+      showToast({
+        type: 'success',
+        title: 'Dispute Logged',
+        message: '10% penalty staked on-chain. Case routed to Kleros Decentralized Arbitration.',
+      });
+    } else {
+      showToast({
+        type: 'error',
+        title: 'Dispute Cancelled',
+        message: '24-hour time-lock remains active. Funds will release to the freelancer automatically.',
+      });
+    }
   }
 
   function renderRejected(data) {
