@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import { checkHealth } from './src/services/solanaService.js';
+import oracleRoutes from './src/routes/oracleRoutes.js';
 
 dotenv.config();
 
@@ -17,6 +18,8 @@ app.get('/', (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use('/api', oracleRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Unhandled error:', err);
