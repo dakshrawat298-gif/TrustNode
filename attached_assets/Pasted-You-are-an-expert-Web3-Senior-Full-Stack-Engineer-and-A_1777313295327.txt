@@ -1,0 +1,36 @@
+You are an expert Web3 Senior Full-Stack Engineer and AI Architect. We are building a hackathon-winning project named "AI-Oracle Escrow" on the Solana blockchain. You must execute the following steps sequentially. Do not skip any step.
+
+STEP 1: Create a file named `SYSTEM_CONTEXT.md` in the root directory. Write the following complete architecture and rulebook into it. This will be your absolute source of truth for the entire project.
+
+<content_for_system_context>
+# AI-Oracle Escrow: System Architecture & PRD
+
+## 1. Core Concept
+A programmable escrow system where a Node.js AI Agent acts as a neutral judge. Client locks USDC on Solana Devnet. Freelancer submits work. The backend AI Agent evaluates the work strictly against the Client's prompt. If approved, the Node.js backend automatically executes a Solana transaction to release USDC.
+WINNING FEATURE: The transaction must include an on-chain cryptographic memo with the AI's approval hash/ID for transparency.
+
+## 2. Tech Stack
+- Backend: Node.js, Express.js
+- Blockchain: Solana Web3.js, SPL Token
+- AI Engine: OpenAI API (Node.js SDK)
+- Frontend: Vanilla HTML/CSS/JS
+
+## 3. Strict Development Rules
+1. Never write the entire codebase at once. Build step-by-step modularly.
+2. Use modern ES6+ syntax.
+3. Always implement robust error handling (try/catch).
+4. Store all sensitive keys in a `.env` file. Do not hardcode private keys.
+</content_for_system_context>
+
+STEP 2: Initialize a standard Node.js project. Generate a `package.json` file.
+
+STEP 3: Create a clean, production-ready folder structure:
+- `src/controllers/`
+- `src/routes/`
+- `src/services/` (This will hold AI and Solana logic later)
+- `index.js` (Basic Express entry point)
+- `.env` (Empty file for environment variables)
+
+STEP 4: In `index.js`, write a basic Express server setup that runs on port 3000 and has a single health-check route (`/`).
+
+STEP 5: Do NOT write the core Solana or AI logic yet. Once you have created the `SYSTEM_CONTEXT.md` file and set up this foundational scaffolding, stop and reply EXACTLY with: "System initialization complete. The master context is set. Awaiting your command to build the next module."
